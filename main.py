@@ -9,8 +9,9 @@ one (latitude/longitude) and posts the answers. Two paths, in order:
      The gateway replaces the trial's stand-in key with the entrant's own
      API key; with no key pushed every call is refused (401) and the
      agent falls through to path 2.
-  2. Code-only fallback: a single fixed coordinate (the median of the
-     public practice pool, aggregate only -- no photo table is shipped).
+  2. Code-only fallback: a single fixed coordinate (the geometric median
+     of the public practice pool, aggregate only -- no photo table is
+     shipped).
 
 Deterministic given the model's answers: photos are processed in fixed
 order p01..p25, answers are posted in that order, no wall clock is read,
@@ -62,10 +63,14 @@ GATEWAY_REFUSAL_TYPES = {
 }
 RETRY_STATUSES = {408, 429, 500, 502, 503, 504, 529}
 
-# Code-only fallback: the component-wise median of the 75 public practice
-# photos (aggregate only; no photo or place table is shipped).
-FALLBACK_LAT = 30.25
-FALLBACK_LON = 21.03
+# Code-only fallback: the geometric median (the point minimising the sum
+# of great-circle distances) of the 75 public practice photos (aggregate
+# only; no photo or place table is shipped). It beats the component-wise
+# median on every held-out practice trial (leave-one-trial-out mean score
+# 329,032 vs 311,848). A finer grid search overfits slightly, so the plain
+# geometric median is used.
+FALLBACK_LAT = 56.14
+FALLBACK_LON = 32.40
 
 # The reasoning prompt sent with every photo. Short reasoning first (it
 # makes the guess much better than a bare coordinate), then one JSON line.
